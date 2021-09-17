@@ -12,11 +12,19 @@ ration et cetera. And because Shell is fucking ugly.
 
 # What is the main idea?
 I don't know yet, i'll be polishing for sure, but is that you have a prefix 
-(~/mitz) where you can extract/copy another operating system of same
+(~/mitzune) where you can extract/copy another operating system of same
 architecture root files (which can be saved on an tarball) and then configure
 it.
 After that, in theory, you'd just need to run Mitzune + the operation + the
 prefix name.
+
+Example:
+mitzune -n minilinux -R ~/Downloads/minilinux-rootfs-0.4.2a-x86_64.tar.xz -c
+
+This will create a prefix with the name of "minilinux", using the
+minilinux-rootfs-0.4.2a-x86_64.tar.xz as the tarball to be extracted.
+You can also create a Shell-style configuration file using the -C option, but i
+couldn't manage to get this working yet... :^|
 
 It's basically containers made by someone who doesn't ever used containers
 before.
@@ -33,7 +41,7 @@ xz -cd mitzune.?.?-?.NOARCH.Linux.tar.xz | tar -xvf - -C ~/
 But, before you ask me, this is a work in progress.
 At this moment, 17th September 2021, you can not chroot into a "prefix" (i need a 
 better name for this) using Mitzune, you'll need to do it manually; like you can't
-map a prefix (using find(1) + xz(1) (for compressing it)) and even delete a prefix yet.
+map a prefix (using find(1) + xz(1) (for compressing it)) yet.
 
 # How do i use it?
 For now, i didn't wrote a manual or even the print_help function yet, so you will
