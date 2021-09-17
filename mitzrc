@@ -1,0 +1,4 @@
+# Files and directories 
+MITZ_PREFIX="~/mitz"
+MITZ_LIBDIR="~/.local/lib"
+DOAS_CONF='/etc/doas.conf'

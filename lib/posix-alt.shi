@@ -1,0 +1,36 @@
+# POSIX shell alternatives for external processes, in a single libary.
+# forked from now defunct Shell Script-written otto-pkg
+
+# basename
+basename(){
+	DIR=${1%${1##*[!/]}}
+	DIR=${DIR##*/}
+	DIR=${DIR%"$2"}
+	printf '%s\n' "${DIR:-/}"
+}
+
+# wc -l
+lines(){
+	while IFS= read -r LINE || [ -n "${LINE}" ]; do
+		LINES=$[ ${LINES} + 1 ]
+	done < "${1}"
+	printf '%s\n' "$LINES"
+	unset LINES
+}
+
+# timeout
+timeout(){
+	"${2}" & local PID="${!}"; sleep "${1}" && kill "${PID}"
+}
+
+# nproc
+nproc(){
+	grep 'processor' /proc/cpuinfo | wc -l 
+}
+
+# The # macro for arrays.
+n(){
+	echo ${@} | tr '' '\n' | wc -l;
+}
+
+##End of alternatives section
