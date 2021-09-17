@@ -4,12 +4,12 @@
 . $HOME/.config/mitzrc
 
 # include libraries
-. $MITZ_LIBDIR/errhand.shi
-. $MITZ_LIBDIR/posix-alt.shi
+. $MITZUNE_LIBDIR/errhand.shi
+. $MITZUNE_LIBDIR/posix-alt.shi
 
 function main {
     while getopts ":n:R:C:cdri" options; do
-	    case $options in
+	    case "$options" in
 		    n) export prefixName="$OPTARG" ;;
 		    R) export rootfsTarball="$OPTARG" ;;
 		    C) export chrootOptions="$OPTARG" ;;
@@ -38,35 +38,46 @@ function check_doas {
 }
 
 function create_prefix {
-    newPrefix="$MITZ_PREFIX/$prefixName"
-    mkdir $newPrefix && \
+    newPrefix="$MITZUNE_PREFIX/$prefixName"
+    mkdir "$newPrefix" && \
     echo "$rootfsTarball"
-    if [ -z $rootfsTarball ]; then
+    if [ -z "$rootfsTarball" ]; then
 	    printerr 'Warning: no rootfs declared, creating empty rootfs directory.'
-	    mkdir -v $newPrefix/rootfs
+	    mkdir -v "$newPrefix/rootfs"
     else
-	    copy2prefix $rootfsTarball $newPrefix
+	    copy2prefix "$rootfsTarball" "$newPrefix"
     fi
-    if [ -z $chrootOptions ]; then
-	    printerr 'Warning: no chroot options informed, creating an emptyfile.'
-	    > $newPrefix/$prefixName.rc
+    if [ -z "$chrootOptions" ]; then
+	    printerr 'Warning: no chroot options informed, creating an empty file.'
+	    > "$newPrefix/$prefixName.rc"
     else
-	    write_prefix_config "$chrootOptions" $prefixName $newPrefix
+	    write_prefix_config "$chrootOptions" "$prefixName" "$newPrefix"
     fi
     # Unfortunately we can't trust lines() when the file is empty
-    installedPrefixes=$(sed '/#/d' "$MITZ_PREFIX/prefixes" | wc -l | awk '{print $1}')
-    printf '%s\n' "$(( installedPrefixes + 1 )) $prefixName $newPrefix $rootfsTarball $(date +%Y-%m-%d)" >> $MITZ_PREFIX/prefixes
-    printerr "Success: $prefixName created succesfully."
+    installedPrefixes="$(sed '/#/d' "$MITZUNE_PREFIX/prefixes" | wc -l | awk '{print $1}')"
+    printf '%s %s %s %s %s\n' "$(( installedPrefixes + 1 ))" "$prefixName" "$newPrefix" "$rootfsTarball" "$(date +%Y-%m-%d)" >> "$MITZUNE_PREFIX/prefixes"
+    printf 'Success: %s prefix created.' "$prefixName"
 }
 
-#function delete_prefix {}
+function delete_prefix {
+    # Remove the prefix itself
+    rm -rvI $MITZUNE_PREFIX/$prefixName || \
+	    oh_mist "Fatal: Couldn'\''t remove $prefixName directory ($MITZUNE_PREFIX/$prefixName)." 6
+    # Create a safe temporary file
+    TMPFILE="$(mktemp)" || oh_mist 'Fatal: Couldn'\''t create temporary file.' 10
+    # Remove the prefix mention at our "database"
+    sed "/$prefixName/d" "$MITZUNE_PREFIX/prefixes" > "$TMPFILE" && \
+	    cat "$TMPFILE" > "$MITZUNE_PREFIX/prefixes"
+    printf 'Success: %s prefix removed.' "$prefixName"
+}
 
 function copy2prefix {
     rootfsTarball=$1
     newPrefix=$2
     # Get rootfs extension using built-in regex
-    		     #  |cut absolute path| |cut extension|
+    		     # |cut absolute path| 
     rootfsTarballExt="${rootfsTarball##*/}"
+    		     # 	      |cut extension|
     rootfsTarballExt="${rootfsTarballExt##*.}"
     case $rootfsTarballExt in
 	    gz|tgz) function c { gzip "$@"; } && export isTarball=t;;
@@ -86,7 +97,7 @@ function write_prefix_config {
 	chrootOptions="$1"
 	prefixName=$2
 	newPrefix=$3
-	printf '%s' "$chrootOptions" > $newPrefix/$prefixName.rc
+	printf '%s' "$chrootOptions" > "$newPrefix/$prefixName.rc"
 }
 
 function run_prefix {

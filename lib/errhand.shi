@@ -8,7 +8,7 @@ function printerr {
 
 function clean_n_quit {
     NUMCODE="$1"
-    trap "unset MITZ_LIBDIR MITZ_PREFIX DOAS_CONF; exit $NUMCODE" 0 1 2 3 15
+    trap "rm -vf $TMPFILE; unset TMPFILE MITZUNE_LIBDIR MITZUNE_PREFIX DOAS_CONF; exit $NUMCODE" 0 1 2 3 15
 }
 
 function oh_mist {
