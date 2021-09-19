@@ -2,13 +2,14 @@
 # their processors
 This is just a prototype that i'm using to test Copacabana Linux on my PC via
 chroot(8) since i don't have support to VMX in my low-end 10-year-old processor.
-Yeah, fuck you Intel, People's Republic of China, TSMC and modern car manufacturers.
+Yeah, fuck you Intel, Republic of China, TSMC and modern car manufacturers.
 And fuck you too, Brazil gov't. I don't deserve being smashed by taxes and 
 inflation and don't getting any nearly decent state services back.
 
 So while i can't afford a new laptop, i will use this.
-If this succeeds, i will remade it in Go, with faggotries like JSON for configu
-ration et cetera. And because Shell is fucking ugly.
+If this succeeds, i will remake it in the cringiest language ever, Go, with
+faggotries like JSON for configuration et cetera. And because Shell is fucking
+ugly.
 
 # What is the main idea?
 I don't know yet, i'll be polishing for sure, but is that you have a prefix 
