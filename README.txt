@@ -26,13 +26,13 @@ minilinux-rootfs-0.4.2a-x86_64.tar.xz as the tarball to be extracted.
 
 You can also create a Shell-style configuration file using the -C option, just
 set it before -c or -r. 
-It still have some bugs in this part; like, for example, on Alpine Linux 3.14
-when you try to source flags for env from a file (using a subshell containing a
-cat) it returns this error:
-> env: can't execute ''': No such file or directory
+Its contents will be sent into chroot's /etc/profile (if OVERWRITE_CHROOT_PROFILE 
+is equal to "true") or into an identificable Mitzune file called mitzune_config.sh 
+located at /etc/profile.d (if OVERWRITE_CHROOT_PROFILE is equal to "false" or 
+anything else).
 
-I'd need a more efficient way to pass variables into chroot's env, but for now i
-really didn't figured out how to do it... :^|
+In Alpine Linux, you may need to source /etc/profile right after logging into it.
+Kinda of fishy bug, but it works so... :^)
 
 It's basically containers made by someone who doesn't ever used containers
 before.
@@ -47,7 +47,7 @@ xz and un-tar it directly to your home directory:
 xz -cd mitzune.?.?-?.NOARCH.Linux.tar.xz | tar -xvf - -C ~/
 
 But, before you ask me, this is a work in progress.
-At this moment, 19th September 2021, you can not chroot into a "prefix" (i need a 
+At this moment, 20th September 2021, you can not chroot into a "prefix" (i need a 
 better name for this) using Mitzune, you'll need to do it manually; like you can't
 map a prefix (using find(1) + xz(1) (for compressing it)) yet.
 
