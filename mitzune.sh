@@ -39,8 +39,8 @@ function check_doas {
 
 function create_prefix {
     newPrefix="$MITZUNE_PREFIX/$prefixName"
+    
     mkdir "$newPrefix" && \
-    echo "$rootfsTarball"
     if [ -z "$rootfsTarball" ]; then
 	    printerr 'Warning: no rootfs declared, creating empty rootfs directory.'
 	    mkdir -v "$newPrefix/rootfs"
@@ -53,9 +53,15 @@ function create_prefix {
     else
 	    write_prefix_config "$chrootOptions" "$prefixName" "$newPrefix"
     fi
+
     # Unfortunately we can't trust lines() when the file is empty
     installedPrefixes="$(sed '/#/d' "$MITZUNE_PREFIX/prefixes" | wc -l | awk '{print $1}')"
-    printf '%s %s %s %s %s\n' "$(( installedPrefixes + 1 ))" "$prefixName" "$newPrefix" "$rootfsTarball" "$(date +%Y-%m-%d)" >> "$MITZUNE_PREFIX/prefixes"
+
+    printf '%s %s %s %s %s %s %s %s\n' "$(( installedPrefixes + 1 ))" \
+    "$prefixName" "$newPrefix" "$prefixConfiguration" \
+    "$rootfsTarball" "$OVERWRITE_CHROOT_PROFILE" \
+    "$chrootProfile" "$(date +%Y-%m-%d)" >> "$MITZUNE_PREFIX/prefixes"
+
     printf 'Success: %s prefix created.' "$prefixName"
 }
 
@@ -63,41 +69,56 @@ function delete_prefix {
     # Remove the prefix itself
     rm -rvI $MITZUNE_PREFIX/$prefixName || \
 	    oh_mist "Fatal: Couldn'\''t remove $prefixName directory ($MITZUNE_PREFIX/$prefixName)." 6
+
     # Create a safe temporary file
     TMPFILE="$(mktemp)" || oh_mist 'Fatal: Couldn'\''t create temporary file.' 10
+
     # Remove the prefix mention at our "database"
     sed "/$prefixName/d" "$MITZUNE_PREFIX/prefixes" > "$TMPFILE" && \
 	    cat "$TMPFILE" > "$MITZUNE_PREFIX/prefixes"
+
     printf 'Success: %s prefix removed.' "$prefixName"
 }
 
 function copy2prefix {
-    rootfsTarball=$1
-    newPrefix=$2
+    rootfsTarball="$1"
+    newPrefix="$2"
     # Get rootfs extension using built-in regex
     		     # |cut absolute path| 
     rootfsTarballExt="${rootfsTarball##*/}"
-    		     # 	      |cut extension|
+    		     # |cut anything before the extension|
     rootfsTarballExt="${rootfsTarballExt##*.}"
-    case $rootfsTarballExt in
+
+    case "$rootfsTarballExt" in
 	    gz|tgz) function c { gzip "$@"; } && export isTarball=t;;
 	    xz|txz) function c { xz "$@"; } && export isTarball=t;;
 	    tar) function  c { cat "$@"; } && export isTarball=t;;
 	    *) export isTarball=f;; # Will just try to copy files as it
-    esac    		   	    # is a directory
+    esac    		   	    # is a directory. It's in God's hands.
+
     mkdir -v $newPrefix/rootfs && \
     if [ $isTarball == 't' ]; then
-	    c -cd $rootfsTarball | tar -xvf - -C $newPrefix/rootfs
+	    c -cd "$rootfsTarball" | tar -xvf - -C "$newPrefix"/rootfs
     elif [ $isTarball == 'f' ]; then
-	    cp -rv $rootfsTarball/* $newPrefix/rootfs
+	    cp -rv "$rootfsTarball"/* "$newPrefix"/rootfs
     fi
 }
 
 function write_prefix_config {
 	chrootOptions="$1"
-	prefixName=$2
-	newPrefix=$3
-	printf '%s' "$chrootOptions" > "$newPrefix/$prefixName.rc"
+	prefixName="$2"
+	newPrefix="$3"
+	prefixConfiguration="$newPrefix/$prefixName.rc"
+
+	printf '%s' "$chrootOptions" > "$prefixConfiguration" && \
+	if [ $OVERWRITE_CHROOT_PROFILE == true ]; then
+		chrootProfile="$newPrefix/rootfs/etc/profile"
+		cp -vf "$prefixConfiguration" "$chrootProfile"
+	else
+		chrootProfile="$newPrefix/rootfs/etc/profile.d/mitzune_conf.sh"
+		cp -vf "$prefixConfiguration" "$chrootProfile"
+	fi
+	export prefixConfiguration chrootProfile
 }
 
 function run_prefix {

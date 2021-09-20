@@ -2,3 +2,6 @@
 MITZUNE_PREFIX="~/mitzune"
 MITZUNE_LIBDIR="~/.local/lib"
 DOAS_CONF='/etc/doas.conf'
+
+# Options
+OVERWRITE_CHROOT_PROFILE=false
