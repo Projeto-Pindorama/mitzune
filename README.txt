@@ -12,9 +12,9 @@ ration et cetera. And because Shell is fucking ugly.
 
 # What is the main idea?
 The main idea is that you have a prefix (~/mitzune) where you can extract/copy
-another UNIX-like (or anything with chroot support) operating system of same
-architecture root files (which can be saved on an tarball) and then configure
-it.
+another UNIX-like (same-kernel, in case of a Linux host, of course) operating 
+system of same architecture root files (which can be saved on an tarball) and 
+then configure it.
 After that, in theory, you'd just need to run Mitzune + the prefix name + the
 operation.
 
@@ -28,7 +28,7 @@ anything else; if you feel the need to use anything else, like for example bzip,
 just pull-resquest it!
 
 You can also create a Shell-style configuration file using the -C option, just
-set it before -c or -r. 
+set it before -c(reate) or -r(un). 
 Its contents will be sent into chroot's /etc/profile (if OVERWRITE_CHROOT_PROFILE 
 is equal to "true") or into an identificable Mitzune file called mitzune_config.sh 
 located at /etc/profile.d (if OVERWRITE_CHROOT_PROFILE is equal to "false" or 
