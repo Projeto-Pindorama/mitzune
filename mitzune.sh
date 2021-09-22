@@ -92,7 +92,7 @@ function copy2prefix {
     case "$rootfsTarballExt" in
 	    gz|tgz) function c { gzip "$@"; } && export isTarball=t;;
 	    xz|txz) function c { xz "$@"; } && export isTarball=t;;
-	    tar) function  c { cat "$@"; } && export isTarball=t;;
+	    tar) function  c { shift; cat "$@"; } && export isTarball=t;;
 	    *) export isTarball=f;; # Will just try to copy files as it
     esac    		   	    # is a directory. It's in God's hands.
 
