@@ -65,7 +65,7 @@ function create_prefix {
     installedPrefixes="$(sed '/#/d' "$MITZUNE_PREFIX/prefixes" | wc -l | awk '{print $1}')"
 
     printf '%s %s %s %s %s %s %s %s\n' "$(( installedPrefixes + 1 ))" \
-    "$prefixName" "$newPrefix" "$prefixConfiguration" \
+    "$prefixName" "$newPrefix" "$prefixProfile" \
     "$rootfsTarball" "$OVERWRITE_CHROOT_PROFILE" \
     "$chrootProfile" "$(date +%Y-%m-%d)" >> "$MITZUNE_PREFIX/prefixes"
 
@@ -115,16 +115,16 @@ function write_prefix_config {
 	chrootOptions="$1"
 	prefixName="$2"
 	newPrefix="$3"
-	prefixConfiguration="$newPrefix/$prefixName.rc"
+	prefixProfile="$newPrefix/$prefixName.rc"
 	prefixMit="$newPrefix/chroot.mit"
 
-	printf '%s' "$chrootOptions" > "$prefixConfiguration" && \
+	printf '%s' "$chrootOptions" > "$prefixProfile" && \
 	if [ $OVERWRITE_CHROOT_PROFILE == true ]; then
 		chrootProfile="$newPrefix/rootfs/etc/profile"
-		cp -vf "$prefixConfiguration" "$chrootProfile"
+		cp -vf "$prefixProfile" "$chrootProfile"
 	else
 		chrootProfile="$newPrefix/rootfs/etc/profile.d/mitzune_conf.sh"
-		cp -vf "$prefixConfiguration" "$chrootProfile"
+		cp -vf "$prefixProfile" "$chrootProfile"
 	fi
 	
 	cat > $prefixMit <<EOF
@@ -142,7 +142,7 @@ function enter_chroot {
 }
 EOF
 
-	export prefixConfiguration chrootProfile prefixMit
+	export prefixProfile chrootProfile prefixMit
 }
 
 function run_prefix {
