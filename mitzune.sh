@@ -146,7 +146,11 @@ EOF
 }
 
 function run_prefix {
-    check_doas
+	prefixtobeRun="$MITZUNE_PREFIX/$prefixName" 
+   	check_doas
+    	source "$prefixtobeRun"/chroot.mit
+	decChrootFunction=`declare -f enter_chroot`
+    	elevate sh -c "$decChrootFunction; enter_chroot"
 }
 
 main "$@"
