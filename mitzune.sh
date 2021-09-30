@@ -64,8 +64,8 @@ function create_prefix {
     # Unfortunately we can't trust lines() when the file is empty
     installedPrefixes="$(sed '/#/d' "$MITZUNE_PREFIX/prefixes" | wc -l | awk '{print $1}')"
 
-    printf '%s %s %s %s %s %s %s %s\n' "$(( installedPrefixes + 1 ))" \
-    "$prefixName" "$newPrefix" "$prefixProfile" \
+    printf '%s %s %s %s %s %s %s %s %s\n' "$(( installedPrefixes + 1 ))" \
+    "$prefixName" "$newPrefix" "$prefixProfile" "$prefixMit"\
     "$rootfsTarball" "$OVERWRITE_CHROOT_PROFILE" \
     "$chrootProfile" "$(date +%Y-%m-%d)" >> "$MITZUNE_PREFIX/prefixes"
 
