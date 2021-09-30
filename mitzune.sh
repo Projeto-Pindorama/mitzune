@@ -28,9 +28,16 @@ function check_doas {
     # doas will be necessary for now since i don't really know how to
     # work with namespaces in Linux for chroot'ing without root rights
     if `grep "$USER" "$DOAS_CONF" &>/dev/null`; then
-    	return 
+ 	function elevate { doas "$@"; }
+	export -f elevate
+   	return 
     elif [ $UID == 0 ]; then
         printerr 'Warning: running as root. This isn'\''t recommended.'
+    elif `id -nG $USER | grep 'wheel'`; then
+	printerr 'Warning: %s can log directly as root, although using doas is better.' \
+		"$USER"
+	function elevate { su -c "$@"; }
+	export -f elevate
     else
         oh_mist 'Fatal: It appears your user doesn'\''t have doas privileges.' 1
     fi
@@ -109,6 +116,7 @@ function write_prefix_config {
 	prefixName="$2"
 	newPrefix="$3"
 	prefixConfiguration="$newPrefix/$prefixName.rc"
+	prefixMit="$newPrefix/chroot.mit"
 
 	printf '%s' "$chrootOptions" > "$prefixConfiguration" && \
 	if [ $OVERWRITE_CHROOT_PROFILE == true ]; then
@@ -118,7 +126,23 @@ function write_prefix_config {
 		chrootProfile="$newPrefix/rootfs/etc/profile.d/mitzune_conf.sh"
 		cp -vf "$prefixConfiguration" "$chrootProfile"
 	fi
-	export prefixConfiguration chrootProfile
+	
+	cat > $prefixMit <<EOF
+# This file is part of Mitzune.
+
+# Copyright (c) 2021 Luiz Antônio Rangel. All rights reserved.
+# This work is licensed under the terms of the MIT license.  
+# For a copy, see <https://opensource.org/licenses/MIT>.
+
+# DO NOT call this function in this file, it will be called
+# in the script.
+
+function enter_chroot {
+	chroot $newPrefix/rootfs /bin/sh
+}
+EOF
+
+	export prefixConfiguration chrootProfile prefixMit
 }
 
 function run_prefix {
