@@ -48,9 +48,11 @@ xz and un-tar it directly to your home directory:
 xz -cd mitzune.?.?-?.NOARCH.Linux.tar.xz | tar -xvf - -C ~/
 
 But, before you ask me, this is a work in progress.
-At this moment, 21th September 2021, you can not chroot into a "prefix" (i need a 
-better name for this) using Mitzune, you'll need to do it manually; like you can't
-map a prefix (using find(1) + xz(1) (for compressing it)) yet.
+At this moment, 05th October 2021, you can't map a prefix (using find(1) + 
+xz(1) (for compressing it)) yet.
+There's already an implementation for chrooting with Mitzune, but it's
+experimental (polite word for "crappy") yet and needs some polishing, but hey,
+it works! :^)
 
 # How do i use it?
 For now, i didn't wrote a manual or even the print_help function yet, so you will
