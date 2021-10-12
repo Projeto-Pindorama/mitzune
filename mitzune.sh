@@ -21,6 +21,7 @@ function main {
 	    esac
     done
     shift $(( OPTIND - 1 ))
+    export SCRIPT_VARS="($(set -o posix; set | sort))"
     clean_n_quit 0
 }
 
