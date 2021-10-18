@@ -146,11 +146,19 @@ EOF
 }
 
 function run_prefix {
-	prefixtobeRun="$MITZUNE_PREFIX/$prefixName" 
-   	check_doas
-    	source "$prefixtobeRun"/chroot.mit
-	decChrootFunction=`declare -f enter_chroot`
-    	elevate sh -c "$decChrootFunction; enter_chroot"
+    prefixtobeRun="$MITZUNE_PREFIX/$prefixName" 
+
+    check_doas
+
+    if [ -n "$chrootOptions" ]; then
+	    printerr 'Warning: rewriting your chroot profile.'
+	    write_prefix_config "$chrootOptions" "$prefixName" "$prefixtobeRun"
+    fi
+
+    source "$prefixtobeRun"/chroot.mit
+    decChrootFunction=`declare -f enter_chroot`
+
+    elevate sh -c "$decChrootFunction; enter_chroot"
 }
 
 main "$@"
