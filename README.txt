@@ -48,7 +48,7 @@ xz and un-tar it directly to your home directory:
 xz -cd mitzune.?.?-?.NOARCH.Linux.tar.xz | tar -xvf - -C ~/
 
 But, before you ask me, this is a work in progress.
-At this moment, 05th October 2021, you can't map a prefix (using find(1) + 
+At this moment, 17th October 2021, you can't map a prefix (using find(1) + 
 xz(1) (for compressing it)) yet.
 There's already an implementation for chrooting with Mitzune, but it's
 experimental (polite word for "crappy") yet and needs some polishing, but hey,
@@ -68,3 +68,7 @@ Me, Luiz Antonio (a.k.a takusuman).
 This is under the MIT license, enjoy it. :^)
 lib/posix-alt.shi is licensed under Caldera License, as it was taken from
 otto-pkg, one of my first projects.
+
+Footnote[1]: "Mitzune" is a pun on the name "Mitsune", which is a character
+from Ken Akamatsu's "Love Hina". The only affiliation between me, Kodansha
+(manga publisher) and Ken Akamatsu is that I'm a big fan of his works. 
