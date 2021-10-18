@@ -17,7 +17,7 @@ function main {
 		    d) delete_prefix ;;
 		    r) run_prefix ;;
 		    i) show_prefix_info ;;
-		    \?) print_help
+		    \?|h) print_help $OPTARG ;;
 	    esac
     done
     shift $(( OPTIND - 1 ))
@@ -159,6 +159,20 @@ function run_prefix {
     decChrootFunction=`declare -f enter_chroot`
 
     elevate sh -c "$decChrootFunction; enter_chroot"
+}
+
+function print_help {
+	printf '%s: illegal option "%s"
+[usage]: %s -n example [options]
+
+options:
+ -n: Prefix name
+ -R: rootfs tarball
+ -C: chroot profile options
+ -c: create new prefix
+ -d: delete existent prefix
+ -r: run existent prefix
+' $PROGNAME $1 $PROGNAME
 }
 
 main "$@"
