@@ -1,6 +1,9 @@
 # error handling library
 # pretty straightfoward
 
+# Program information, why not?
+PROGNAME=`basename $0`
+
 # Use this both for warnings and errors
 function printerr {
     printf '%s\n' "$@" 1>&2
