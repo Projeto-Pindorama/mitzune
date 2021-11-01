@@ -161,6 +161,28 @@ function run_prefix {
     elevate sh -c "$decChrootFunction; enter_chroot"
 }
 
+function show_prefix_info {
+	prefix_info=(`grep "$prefixName" "$MITZUNE_PREFIX/prefixes"`)
+	prefix_partition=`df -H "${prefix_info[3]}" | awk 'FNR==2 {print $1}'`
+	# Mitzune's prefixes file is a matrix which has 9 columns
+	if [ $(n ${prefix_info[@]}) \< '9' ]; then
+		printerr 'Warning: some information about the prefix isn'\''t avaliable'
+	fi
+	printf '
+prefix name: %s
+prefix path: %s
+prefix number: %s
+partition: %s
+prefix configuration: %s
+prefix shell profile: %s
+chroot profile overwrite?: %s
+creation date: %s
+' "${prefix_info[1]}" $(trim_home_path "${prefix_info[2]}") "${prefix_info[1]}" \
+	"$prefix_partition" $(trim_home_path "${prefix_info[4]}") \
+	$(trim_home_path "${prefix_info[7]}") "${prefix_info[6]}" \
+	"${prefix_info[8]}"
+}
+
 function print_help {
 	printf '%s: illegal option "%s"
 [usage]: %s -n example [options]
@@ -172,6 +194,7 @@ options:
  -c: create new prefix
  -d: delete existent prefix
  -r: run existent prefix
+ -i: show prefix information
 ' $PROGNAME $1 $PROGNAME
 }
 
