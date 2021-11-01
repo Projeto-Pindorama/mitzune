@@ -1,4 +1,4 @@
-# Mitzune - chroot environments, for poor lads who don't have VMX support on
+# Mitzune[1] - chroot environments, for poor lads who don't have VMX support on
 # their processors
 This is just a prototype that i'm using to test Copacabana Linux on my PC via
 chroot(8) since i don't have support to VMX in my low-end 10-year-old processor.
@@ -24,7 +24,7 @@ mitzune -n copacabana -R ~/projects/copacabana_olinux-rootfs-0.4.2a-x86_64.tar.x
 This will create a prefix with the name of "copacabana", using the
 copacabana_olinux-rootfs-0.4.2a-x86_64.tar.xz as the tarball to be extracted.
 It supports extracting gzip and xz'd files-- i don't think you would need
-anything else; if you feel the need to use anything else, like for example bzip,
+anything else; if you feel the need to use anything else, like for example bzip2,
 just pull-resquest it!
 
 You can also create a Shell-style configuration file using the -C option, just
@@ -55,11 +55,34 @@ experimental (polite word for "crappy") yet and needs some polishing, but hey,
 it works! :^)
 
 # How do i use it?
-For now, i didn't wrote a manual or even the print_help function yet, so you will
-need to read the code. Sorry... :^(
-But, if you mind helping me, you can write a small text about the functions or
-even the print_help function and pull-request-it.
+For now, i didn't wrote a manual yet, so you will need to read the code to know
+better what happens under the table. Sorry... :^(
+But, if you mind helping me, you can write a small text about the functions and
+pull-request-it.
 I would be grateful. :^)
+
+## Hacking
+Mitzune's code is fairly readable even for ones who doesn't actually program in
+Shell Script, I've been also keeping a consistent and sane code-style (result of
+years of experience being beaten by syntax errors or by reading my own code and
+don't understanding it).
+
+Good references for learning Shell Script for hacking Mitzune's code are the
+"Advanced Bash-Scripting Guide", "Learning the Korn Shell, 2nd Edition" and, for
+Portuguese language speakers, "Programação Shell Linux" --- which tries to teach
+characteristics both from GNU Bourne-Again Shell, Korn Shell and some even from
+the crappy POSIX standard.
+
+The ABS can be found on TLDP.org, it's public domain! :^)
+"Learning the Korn Shell" is a paid book, but can be found for free in some
+"Milk (doc)store" from Ukraine.
+"Programação Shell Linux" is also a paid book, but an older version from around
+2010 (the 8th edition) can be found in some site whose name recalls "doceiro"
+(the portuguese word for "confectioner").
+
+Although Bash is used here, I prefer the Korn Shell syntax for the most part of
+things. I just didn't ported Mitzune 100% for Korn Shell yet because of other
+things, such as getopt doesn't working the same.
 
 # Who can i blame for it?
 Me, Luiz Antonio (a.k.a takusuman).
@@ -70,5 +93,10 @@ lib/posix-alt.shi is licensed under Caldera License, as it was taken from
 otto-pkg, one of my first projects.
 
 Footnote[1]: "Mitzune" is a pun on the name "Mitsune", which is a character
-from Ken Akamatsu's "Love Hina". The only affiliation between me, Kodansha
-(manga publisher) and Ken Akamatsu is that I'm a big fan of his works. 
+from Ken Akamatsu's "Love Hina".
+Mitsune is a young woman who have voluptuous foxy eyes, and a light brown,
+short and somewhat fluffy hair. She likes to drink sake, gambling and
+causing mischief when she's bored, but she never goes over the limit.
+
+The only affiliation between me, Kodansha (manga publisher) and Ken Akamatsu
+is that I'm a big fan of his works.
