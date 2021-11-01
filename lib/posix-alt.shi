@@ -30,7 +30,12 @@ nproc(){
 
 # The # macro for arrays.
 n(){
-	echo ${@} | tr '' '\n' | wc -l;
+	# based on what Caio did on Copacabana cmd/download_sources.sh
+	echo ${@} | wc -w
+}
+
+trim_home_path(){
+	echo ${@} | sed 's@.*/home/@~@'
 }
 
 ##End of alternatives section
