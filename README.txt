@@ -1,12 +1,12 @@
-# Mitzune[1] - chroot environments, for poor lads who don't have VMX support on
+# Mitzune - chroot environments, for poor lads who don't have VMX support on
 # their processors
-This is just a prototype that i'm using to test Copacabana Linux on my PC via
-chroot(8) since i don't have support to VMX in my low-end 10-year-old processor.
+This is just a prototype that I'm using to test Copacabana Linux on my PC via
+chroot(8) since I don't have support to VMX in my low-end 10-year-old processor.
 Yeah, fuck you Intel, People's Republic of China, TSMC and modern car manufacturers.
 And fuck you too, Brazil gov't. I don't deserve being smashed by taxes and 
 inflation and don't getting any nearly decent state services back.
 
-So while i can't afford a new laptop, i will use this.
+So while I can't afford a new laptop, I will use this.
 If this succeeds, i will remake it in Go, with faggotries like JSON for configu
 ration et cetera. And because Shell is fucking ugly.
 
@@ -23,7 +23,7 @@ mitzune -n copacabana -R ~/projects/copacabana_olinux-rootfs-0.4.2a-x86_64.tar.x
 
 This will create a prefix with the name of "copacabana", using the
 copacabana_olinux-rootfs-0.4.2a-x86_64.tar.xz as the tarball to be extracted.
-It supports extracting gzip and xz'd files-- i don't think you would need
+It supports extracting gzip and xz'd files-- I don't think you would need
 anything else; if you feel the need to use anything else, like for example bzip2,
 just pull-resquest it!
 
@@ -40,7 +40,7 @@ Kind of a fishy bug, but it works so... :^)
 It's basically containers made by someone who doesn't ever used popular containers
 before.
 
-# How do i install it?
+# How do I install it?
 I've designed it to be used as an user-local script, not system-wide.
 You can install it using this pipeline, which extracts the tarball release from
 xz and un-tar it directly to your home directory:
@@ -54,8 +54,9 @@ There's already an implementation for chrooting with Mitzune, but it's
 experimental (polite word for "crappy") yet and needs some polishing, but hey,
 it works! :^)
 
-# How do i use it?
-For now, i didn't wrote a manual yet, so you will need to read the code to know
+# How do I use it?
+There's a print_help function containing information about the basic usage.
+For now, I didn't wrote a manual yet, so you will need to read the code to know
 better what happens under the table. Sorry... :^(
 But, if you mind helping me, you can write a small text about the functions and
 pull-request-it.
@@ -92,11 +93,12 @@ This is under the MIT license, enjoy it. :^)
 lib/posix-alt.shi is licensed under Caldera License, as it was taken from
 otto-pkg, one of my first projects.
 
-Footnote[1]: "Mitzune" is a pun on the name "Mitsune", which is a character
+Footnote[0]: "Mitzune" is a pun on the name "Mitsune", which is a character
 from Ken Akamatsu's "Love Hina".
-Mitsune is a young woman who have voluptuous foxy eyes, and a light brown,
-short and somewhat fluffy hair. She likes to drink sake, gambling and
-causing mischief when she's bored, but she never goes over the limit.
+Mitsune is a beautiful young woman who have voluptuous foxy eyes, and a light
+brown, short/boyish (and somewhat fluffy) hair. She likes drinking sake,
+gambling and causing mischief when she's bored, but she never goes over the
+limit.
 
 The only affiliation between me, Kodansha (manga publisher) and Ken Akamatsu
 is that I'm a big fan of his works.
