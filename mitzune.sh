@@ -121,12 +121,14 @@ function write_prefix_config {
 	printf '%s' "$chrootOptions" > "$prefixProfile" && \
 	if [ $OVERWRITE_CHROOT_PROFILE == true ]; then
 		chrootProfile="$newPrefix/rootfs/etc/profile"
-		cp -vf "$prefixProfile" "$chrootProfile"
 	else
 		chrootProfile="$newPrefix/rootfs/etc/profile.d/mitzune_conf.sh"
-		cp -vf "$prefixProfile" "$chrootProfile"
 	fi
-	
+
+	test -e "$(dirname $chrootProfile)" \
+		|| mkdir -p "$(dirname $chrootProfile)"
+	cp -vf "$prefixProfile" "$chrootProfile"
+
 	cat > $prefixMit <<EOF
 # This file is part of Mitzune.
 
