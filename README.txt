@@ -7,7 +7,7 @@ And fuck you too, Brazil gov't. I don't deserve being smashed by taxes and
 inflation and don't getting any nearly decent state services back.
 
 So while I can't afford a new laptop, I will use this.
-If this succeeds, i will remake it in Go, with faggotries like JSON for configu
+If this succeeds, I will remake it in Go, with faggotries like JSON for configu
 ration et cetera. And because Shell is fucking ugly.
 
 # What is the main idea?
@@ -54,6 +54,14 @@ There's already an implementation for chrooting with Mitzune, but it's
 experimental (polite word for "crappy") yet and needs some polishing, but hey,
 it works! :^)
 
+## Dependencies
+- GNU Bourne-Again Shell;
+- The classical standard Unix utilities --- how far I've tested only Plan 9's
+  give some odd bugs, otherwise, all the others tend to work perfectly;
+- Any tar implementation --- I recommend using star;
+- xz and gzip --- I recommend using pigz instead of gzip, since it's fairly
+  faster.
+
 # How do I use it?
 There's a print_help function containing information about the basic usage.
 For now, I didn't wrote a manual yet, so you will need to read the code to know
@@ -78,8 +86,8 @@ The ABS can be found on TLDP.org, it's public domain! :^)
 "Learning the Korn Shell" is a paid book, but can be found for free in some
 "Milk (doc)store" from Ukraine.
 "Programação Shell Linux" is also a paid book, but an older version from around
-2010 (the 8th edition) can be found in some site whose name recalls "doceiro"
-(the portuguese word for "confectioner").
+2010 (the 8th edition) can be found in some site whose name sounds like
+"doceiro" (the portuguese word for "confectioner").
 
 Although Bash is used here, I prefer the Korn Shell syntax for the most part of
 things. I just didn't ported Mitzune 100% for Korn Shell yet because of other
@@ -99,6 +107,5 @@ Mitsune is a beautiful young woman who have voluptuous foxy eyes, and a light
 brown, short/boyish (and somewhat fluffy) hair. She likes drinking sake,
 gambling and causing mischief when she's bored, but she never goes over the
 limit.
-
 The only affiliation between me, Kodansha (manga publisher) and Ken Akamatsu
 is that I'm a big fan of his works.
