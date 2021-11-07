@@ -65,9 +65,9 @@ function create_prefix {
     installedPrefixes="$(sed '/#/d' "$MITZUNE_PREFIX/prefixes" | wc -l | awk '{print $1}')"
 
     printf '%s %s %s %s %s %s %s %s %s\n' "$(( installedPrefixes + 1 ))" \
-    "$prefixName" "$newPrefix" "$prefixProfile" "$prefixMit"\
-    "$rootfsTarball" "$OVERWRITE_CHROOT_PROFILE" \
-    "$chrootProfile" "$(date +%Y-%m-%d)" >> "$MITZUNE_PREFIX/prefixes"
+    "$prefixName" "$newPrefix" "${prefixProfile:-NULL}" "${prefixMit:-NULL}" \
+    "${rootfsTarball:-NULL}" "$OVERWRITE_CHROOT_PROFILE" \
+    "${chrootProfile:-NULL}" "$(date +%Y-%m-%d)" >> "$MITZUNE_PREFIX/prefixes"
 
     printf 'Success: %s prefix created.' "$prefixName"
 }
@@ -107,7 +107,7 @@ function copy2prefix {
     if [ $isTarball == 't' ]; then
 	    c -cd "$rootfsTarball" | tar -xvf - -C "$newPrefix"/rootfs
     elif [ $isTarball == 'f' ]; then
-	    cp -rv "$rootfsTarball"/* "$newPrefix"/rootfs
+	    cp -rv "$rootfsTarball/*" "$newPrefix"/rootfs
     fi
 }
 
@@ -164,12 +164,19 @@ function run_prefix {
 }
 
 function show_prefix_info {
-	prefix_info=(`grep "$prefixName" "$MITZUNE_PREFIX/prefixes"`)
-	prefix_partition=`df -H "${prefix_info[3]}" | awk 'FNR==2 {print $1}'`
+	# Transforms the line containing the $prefixName information
+	# in an array.
+	# This is fairly faster than just using awk, since we're
+	# just throwing the information at the memory instead of
+	# pulling it from the disc every time.
+	prefix_info=($(grep "$prefixName" "$MITZUNE_PREFIX/prefixes"))
+	prefix_partition=$(df -H "${prefix_info[2]}" | awk 'FNR==2 {print $1}')
+	
 	# Mitzune's prefixes file is a matrix which has 9 columns
-	if [ $(n ${prefix_info[@]}) \< '9' ]; then
+	if [ $(n $(echo ${prefix_info[*]} | tr -d 'NULL')) \< '9' ]; then
 		printerr 'Warning: some information about the prefix isn'\''t avaliable'
 	fi
+
 	printf '
 prefix name: %s
 prefix path: %s
@@ -179,7 +186,7 @@ prefix configuration: %s
 prefix shell profile: %s
 chroot profile overwrite?: %s
 creation date: %s
-' "${prefix_info[1]}" $(trim_home_path "${prefix_info[2]}") "${prefix_info[1]}" \
+' "${prefix_info[1]}" $(trim_home_path "${prefix_info[2]}") "${prefix_info[0]}" \
 	"$prefix_partition" $(trim_home_path "${prefix_info[4]}") \
 	$(trim_home_path "${prefix_info[7]}") "${prefix_info[6]}" \
 	"${prefix_info[8]}"
@@ -198,6 +205,8 @@ options:
  -r: run existent prefix
  -i: show prefix information
 ' $PROGNAME $1 $PROGNAME
+
+	exit 0
 }
 
 main "$@"
