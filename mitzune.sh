@@ -78,7 +78,7 @@ function delete_prefix {
 	    oh_mist "Fatal: Couldn'\''t remove $prefixName directory ($MITZUNE_PREFIX/$prefixName)." 6
 
     # Create a safe temporary file
-    TMPFILE="$(mktemp)" || oh_mist 'Fatal: Couldn'\''t create temporary file.' 10
+    TMPFILE="$(mktemp -t mitzune.XXXXXX)" || oh_mist 'Fatal: Couldn'\''t create temporary file.' 10
 
     # Remove the prefix mention at our "database"
     sed "/$prefixName/d" "$MITZUNE_PREFIX/prefixes" > "$TMPFILE" && \
