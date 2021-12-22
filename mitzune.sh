@@ -8,7 +8,7 @@
 . $MITZUNE_LIBDIR/posix-alt.shi
 
 function main {
-    while getopts ":n:R:C:cdri" options; do
+    while getopts ":n:R:C:cdriEI" options; do
 	    case "$options" in
 		    n) export prefixName="$OPTARG" ;;
 		    R) export rootfsTarball="$OPTARG" ;;
@@ -17,6 +17,8 @@ function main {
 		    d) delete_prefix ;;
 		    r) run_prefix ;;
 		    i) show_prefix_info ;;
+		    E) export_prefix ;;
+		    I) import_prefix ;;
 		    \?|h) print_help $OPTARG ;;
 	    esac
     done
@@ -190,6 +192,14 @@ creation date: %s
 	"$prefix_partition" $(trim_home_path "${prefix_info[4]}") \
 	$(trim_home_path "${prefix_info[7]}") "${prefix_info[6]}" \
 	"${prefix_info[8]}"
+}
+
+function export_prefix { 
+	return 0 # TODO
+}
+
+function import_prefix { 
+	return 0 # TODO
 }
 
 function print_help {
