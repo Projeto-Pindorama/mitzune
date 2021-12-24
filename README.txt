@@ -56,6 +56,7 @@ it works! :^)
 
 ## Dependencies
 - GNU Bourne-Again Shell;
+- OpenDoas --- for privilege elevation;
 - The classical standard Unix utilities --- how far I've tested only Plan 9's
   give some odd bugs, otherwise, all the others tend to work perfectly;
 - Any tar implementation --- I recommend using star;
@@ -109,3 +110,8 @@ gambling and causing mischief when she's bored, but she never goes over the
 limit.
 The only affiliation between me, Kodansha (manga publisher) and Ken Akamatsu
 is that I'm a big fan of his works.
+
+Footnote[1]: Yeah, I've already got a new laptop, but I won't give up on
+Mitzune. Besides Copacabana build consolidation already depending on it, I know
+that are people over there with old and low-end PCs that may will need it in the
+future.
