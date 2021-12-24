@@ -29,13 +29,13 @@ function main {
 function check_doas {
     # doas will be necessary for now since i don't really know how to
     # work with namespaces in Linux for chroot'ing without root rights
-    if `grep "$USER" "$DOAS_CONF" &>/dev/null`; then
+    if $(grep "$USER" "$DOAS_CONF" &>/dev/null); then
  	function elevate { doas "$@"; }
 	export -f elevate
    	return 
     elif [ $UID == 0 ]; then
         printerr 'Warning: running as root. This isn'\''t recommended.'
-    elif `id -nG $USER | grep 'wheel'`; then
+    elif $(id -nG $USER | grep 'wheel'); then
 	printerr 'Warning: %s can log directly as root, although using doas is better.' \
 		"$USER"
 	function elevate { su -c "$@"; }
@@ -47,14 +47,16 @@ function check_doas {
 }
 
 function create_prefix {
-    newPrefix="$MITZUNE_PREFIX/$prefixName"
-    
+    newPrefix="$(realpath "$MITZUNE_PREFIX/$prefixName")"
+
     mkdir "$newPrefix" && \
     if [ -z "$rootfsTarball" ]; then
 	    printerr 'Warning: no rootfs declared, creating empty rootfs directory.'
 	    mkdir -v "$newPrefix/rootfs"
     else
-	    copy2prefix "$rootfsTarball" "$newPrefix"
+	    realpathRootfsTarball="$(realpath "$rootfsTarball")"
+	    copy2prefix "$realpathRootfsTarball" "$newPrefix"
+	    unset realpathRootfsTarball
     fi
     if [ -z "$chrootOptions" ]; then
 	    printerr 'Warning: no chroot options informed, creating an empty file.'
@@ -63,6 +65,11 @@ function create_prefix {
 	    write_prefix_config "$chrootOptions" "$prefixName" "$newPrefix"
     fi
 
+    # This function generates chroot.mit, independently from chrootOptions
+    # being NULL or not, since this file is essential to initialize the chroot
+    # prefix.
+    write_chroot_mitzune "$newPrefix"
+    
     # Unfortunately we can't trust lines() when the file is empty
     installedPrefixes="$(sed '/#/d' "$MITZUNE_PREFIX/prefixes" | wc -l | awk '{print $1}')"
 
@@ -77,7 +84,7 @@ function create_prefix {
 function delete_prefix {
     # Remove the prefix itself
     rm -rvI $MITZUNE_PREFIX/$prefixName || \
-	    oh_mist "Fatal: Couldn'\''t remove $prefixName directory ($MITZUNE_PREFIX/$prefixName)." 6
+	    oh_mist "Fatal: Couldn't remove $prefixName directory ($MITZUNE_PREFIX/$prefixName)." 6
 
     # Create a safe temporary file
     TMPFILE="$(mktemp -t mitzune.XXXXXX)" || oh_mist 'Fatal: Couldn'\''t create temporary file.' 10
@@ -118,7 +125,6 @@ function write_prefix_config {
 	prefixName="$2"
 	newPrefix="$3"
 	prefixProfile="$newPrefix/$prefixName.rc"
-	prefixMit="$newPrefix/chroot.mit"
 
 	printf '%s' "$chrootOptions" > "$prefixProfile" && \
 	if [ $OVERWRITE_CHROOT_PROFILE == true ]; then
@@ -130,7 +136,13 @@ function write_prefix_config {
 	test -e "$(dirname $chrootProfile)" \
 		|| mkdir -p "$(dirname $chrootProfile)"
 	cp -vf "$prefixProfile" "$chrootProfile"
+	
+	export prefixProfile chrootProfile
+}
 
+function write_chroot_mitzune { 
+	newPrefix="$1"
+	prefixMit="$newPrefix/chroot.mit"
 	cat > $prefixMit <<EOF
 # This file is part of Mitzune.
 
@@ -145,8 +157,8 @@ function enter_chroot {
 	chroot $newPrefix/rootfs /bin/sh
 }
 EOF
-
-	export prefixProfile chrootProfile prefixMit
+	export prefixMit
+	
 }
 
 function run_prefix {
@@ -160,7 +172,7 @@ function run_prefix {
     fi
 
     source "$prefixtobeRun"/chroot.mit
-    decChrootFunction=`declare -f enter_chroot`
+    decChrootFunction=$(declare -f enter_chroot)
 
     elevate sh -c "$decChrootFunction; enter_chroot"
 }
@@ -214,6 +226,11 @@ options:
  -d: delete existent prefix
  -r: run existent prefix
  -i: show prefix information
+ -E: export prefix (TODO)
+ -I: import prefix (TODO (too))
+
+The Pindorama developers wish you a merry Christmas and a happy new year.
+Thanks for running Mitzune!
 ' $PROGNAME $1 $PROGNAME
 
 	exit 0
