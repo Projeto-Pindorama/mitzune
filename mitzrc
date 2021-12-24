@@ -1,6 +1,6 @@
 # Files and directories 
-MITZUNE_PREFIX="~/mitzune"
-MITZUNE_LIBDIR="~/.local/lib"
+MITZUNE_PREFIX="$HOME/mitzune"
+MITZUNE_LIBDIR="$HOME/.local/lib"
 DOAS_CONF='/etc/doas.conf'
 
 # Options
