@@ -7,6 +7,9 @@
 . $MITZUNE_LIBDIR/errhand.shi
 . $MITZUNE_LIBDIR/posix-alt.shi
 
+# Cuz I'm real
+mitzune_prefix="$(realpath "$MITZUNE_PREFIX")"
+
 function main {
     while getopts ":n:R:C:cdriEI" options; do
 	    case "$options" in
@@ -47,7 +50,7 @@ function check_doas {
 }
 
 function create_prefix {
-    newPrefix="$(realpath "$MITZUNE_PREFIX/$prefixName")"
+    newPrefix="$mitzune_prefix/$prefixName"
 
     mkdir "$newPrefix" && \
     if [ -z "$rootfsTarball" ]; then
@@ -71,27 +74,27 @@ function create_prefix {
     write_chroot_mitzune "$newPrefix"
     
     # Unfortunately we can't trust lines() when the file is empty
-    installedPrefixes="$(sed '/#/d' "$MITZUNE_PREFIX/prefixes" | wc -l | awk '{print $1}')"
+    installedPrefixes="$(sed '/#/d' "$mitzune_prefix/prefixes" | wc -l | awk '{print $1}')"
 
     printf '%s %s %s %s %s %s %s %s %s\n' "$(( installedPrefixes + 1 ))" \
     "$prefixName" "$newPrefix" "${prefixProfile:-NULL}" "${prefixMit:-NULL}" \
     "${rootfsTarball:-NULL}" "$OVERWRITE_CHROOT_PROFILE" \
-    "${chrootProfile:-NULL}" "$(date +%Y-%m-%d)" >> "$MITZUNE_PREFIX/prefixes"
+    "${chrootProfile:-NULL}" "$(date +%Y-%m-%d)" >> "$mitzune_prefix/prefixes"
 
     printf 'Success: %s prefix created.' "$prefixName"
 }
 
 function delete_prefix {
     # Remove the prefix itself
-    rm -rvI $MITZUNE_PREFIX/$prefixName || \
-	    oh_mist "Fatal: Couldn't remove $prefixName directory ($MITZUNE_PREFIX/$prefixName)." 6
+    rm -rvI $mitzune_prefix/$prefixName || \
+	    oh_mist "Fatal: Couldn't remove $prefixName directory ($mitzune_prefix/$prefixName)." 6
 
     # Create a safe temporary file
     TMPFILE="$(mktemp -t mitzune.XXXXXX)" || oh_mist 'Fatal: Couldn'\''t create temporary file.' 10
 
     # Remove the prefix mention at our "database"
-    sed "/$prefixName/d" "$MITZUNE_PREFIX/prefixes" > "$TMPFILE" && \
-	    cat "$TMPFILE" > "$MITZUNE_PREFIX/prefixes"
+    sed "/$prefixName/d" "$mitzune_prefix/prefixes" > "$TMPFILE" && \
+	    cat "$TMPFILE" > "$mitzune_prefix/prefixes"
 
     printf 'Success: %s prefix removed.' "$prefixName"
 }
@@ -162,7 +165,7 @@ EOF
 }
 
 function run_prefix {
-    prefixtobeRun="$MITZUNE_PREFIX/$prefixName" 
+    prefixtobeRun="$mitzune_prefix/$prefixName" 
 
     check_doas
 
@@ -183,7 +186,7 @@ function show_prefix_info {
 	# This is fairly faster than just using awk, since we're
 	# just throwing the information at the memory instead of
 	# pulling it from the disc every time.
-	prefix_info=($(grep "$prefixName" "$MITZUNE_PREFIX/prefixes"))
+	prefix_info=($(grep "$prefixName" "$mitzune_prefix/prefixes"))
 	prefix_partition=$(df -H "${prefix_info[2]}" | awk 'FNR==2 {print $1}')
 	
 	# Mitzune's prefixes file is a matrix which has 9 columns
