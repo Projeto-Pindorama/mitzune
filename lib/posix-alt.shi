@@ -9,6 +9,18 @@ basename(){
 	printf '%s\n' "${DIR:-/}"
 }
 
+# realpath
+realpath(){
+  # ./sources.txt -> sources.txt
+  file_basename=`basename $1`
+  # ./sources.txt -> .
+  file_dirname=`dirname $1`
+	# get the absolute directory name
+	# example: ./sources.txt -> /usr/src/copacabana-repo/sources.txt
+	# cd ./; pwd -> /usr/src/copacabana-repo
+  echo "`cd "${file_dirname}"; pwd`/${file_basename}"
+}
+
 # wc -l
 lines(){
 	while IFS= read -r LINE || [ -n "${LINE}" ]; do
