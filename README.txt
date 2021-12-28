@@ -55,7 +55,7 @@ experimental (polite word for "crappy") yet and needs some polishing, but hey,
 it works! :^)
 
 ## Dependencies
-- GNU Bourne-Again Shell;
+- GNU Broken-Again Shell;
 - OpenDoas --- for privilege elevation;
 - The classical standard Unix utilities --- how far I've tested only Plan 9's
   give some odd bugs, otherwise, all the others tend to work perfectly;
@@ -94,16 +94,36 @@ Although Bash is used here, I prefer the Korn Shell syntax for the most part of
 things. I just didn't ported Mitzune 100% for Korn Shell yet because of other
 things, such as getopt doesn't working the same.
 
-# Who can i blame for it?
+# Who can I blame for it?
 Me, Luiz Antonio (a.k.a takusuman).
 
-# How can i share it?
+## Who wrote these libraries?
+errhand.shi was written entirely by me. As its name already says, it's meant
+to be a simple error handling library. It is meant to be used in Mitzune, but
+you can fork it and hack it to work as you want in your script (see "Hacking"
+above).
+
+posix-alt.shi, as I said below, was taken from my old, badly-written and
+defunct project, otto-pkg --- and, because of that, it isn't on MIT, but in
+the Caldera License --- and resurrected into something useful.
+It is a collection of copycenter-licensed (MIT, BSD etc) Shell functions
+from other hackers across the 'Net and, in majority, our own authoral work.
+Since this "read me" is somewhat also Mitzune's documentation, I'll credit
+everyone that some piece of work on it:
+• realpath(), timeout(), nproc() and n() by Luiz Antonio;
+• n() written originally by Luiz Antonio (as said above), rewritten from
+scratch (and fixed) by Caio Yoshimura in September 2021;
+• basename() and lines() also from Araps' pure-sh-bible;
+• lines() was incorporated by Caio Yoshimura, originally from Araps'
+pure-sh-bible, line counter fixed by Luiz Antonio in June 2021.
+
+# How can I share it?
 This is under the MIT license, enjoy it. :^)
 lib/posix-alt.shi is licensed under Caldera License, as it was taken from
 otto-pkg, one of my first projects.
 
-Footnote[0]: "Mitzune" is a pun on the name "Mitsune", which is a character
-from Ken Akamatsu's "Love Hina".
+Footnote[0]: "Mitzune" is a pun on the name "Mitsune Konno", which is a
+character from Ken Akamatsu's "Love Hina".
 Mitsune is a beautiful young woman who have voluptuous foxy eyes, and a light
 brown, short/boyish (and somewhat fluffy) hair. She likes drinking sake,
 gambling and causing mischief when she's bored, but she never goes over the
