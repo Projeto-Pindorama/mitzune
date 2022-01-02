@@ -55,13 +55,17 @@ experimental (polite word for "crappy") yet and needs some polishing, but hey,
 it works! :^)
 
 ## Dependencies
-- GNU Broken-Again Shell;
-- OpenDoas --- for privilege elevation;
-- The classical standard Unix utilities --- how far I've tested only Plan 9's
+• GNU Broken-Again Shell;
+• OpenDoas --- for privilege elevation;
+• The classical standard Unix utilities --- how far I've tested only Plan 9's
   give some odd bugs, otherwise, all the others tend to work perfectly;
-- Any tar implementation --- I recommend using star;
-- xz and gzip --- I recommend using pigz instead of gzip, since it's fairly
+• Any tar implementation --- I recommend using star;
+• xz and gzip --- I recommend using pigz instead of gzip, since it's fairly
   faster.
+
+## Get Mitzune
+Releases and VCS snapshots can be found at get.pindorama.dob.jp.
+http://get.pindorama.dob.jp/mitzune
 
 # How do I use it?
 There's a print_help function containing information about the basic usage.
