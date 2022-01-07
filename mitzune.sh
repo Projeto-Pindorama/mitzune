@@ -33,7 +33,7 @@ function check_doas {
     # doas will be necessary for now since i don't really know how to
     # work with namespaces in Linux for chroot'ing without root rights
     if $(grep "$USER" "$DOAS_CONF" &>/dev/null); then
- 	function elevate { doas "$@"; }
+ 	function elevate { doas -- "$@"; }
 	export -f elevate
    	return 
     elif [ $UID == 0 ]; then
