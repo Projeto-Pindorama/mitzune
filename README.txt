@@ -117,7 +117,7 @@ everyone that some piece of work on it:
 • realpath(), timeout(), nproc() and n() by Luiz Antonio;
 • n() written originally by Luiz Antonio (as said above), rewritten from
 scratch (and fixed) by Caio Yoshimura in September 2021;
-• basename() and lines() also from Araps' pure-sh-bible;
+• basename() and lines() from Araps' pure-sh-bible;
 • lines() was incorporated by Caio Yoshimura, originally from Araps'
 pure-sh-bible, line counter fixed by Luiz Antonio in June 2021.
 
