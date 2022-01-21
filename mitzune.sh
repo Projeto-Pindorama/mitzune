@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Source user configuration
 . $HOME/.config/mitzrc
@@ -22,7 +22,7 @@ function main {
 		    i) show_prefix_info ;;
 		    E) export_prefix ;;
 		    I) import_prefix ;;
-		    \?|h) print_help $OPTARG ;;
+		    *|\?|h) print_help $OPTARG ;;
 	    esac
     done
     shift $(( OPTIND - 1 ))
