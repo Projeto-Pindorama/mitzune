@@ -20,8 +20,8 @@ function main {
 		    d) delete_prefix ;;
 		    r) run_prefix ;;
 		    i) show_prefix_info ;;
-		    E) export_prefix ;;
-		    I) import_prefix ;;
+		    E) export_prefix $OPTARG ;;
+		    I) import_prefix $OPTARG ;;
 		    *|\?|h) print_help $OPTARG ;;
 	    esac
     done
@@ -252,11 +252,8 @@ options:
  -d: delete existent prefix
  -r: run existent prefix
  -i: show prefix information
- -E: export prefix (TODO)
- -I: import prefix (TODO (too))
-
-The Pindorama developers wish you a merry Christmas and a happy new year.
-Thanks for running Mitzune!
+ -E: export prefix
+ -I: import prefix (TODO)
 ' $PROGNAME $1 $PROGNAME
 
 	exit 0
