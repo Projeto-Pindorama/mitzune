@@ -223,6 +223,8 @@ function export_prefix {
 	#  This can be later imported and extracted into a new (or the
 	#  same, it doesn't matter) $MITZUNE_PREFIX. Yeah, directly into
 	#  it, not extracted directly on the $HOME.
+	#  The final file extension (mexp -> (M)itzune (ex)ported (p)refix)
+	#  is just a tarball compressed with xz.
 
 	#  It is indeed expected that the prefix will be inside the
 	#  $MITZUNE_PREFIX informed at mitzrc(5), not anywhere else.
@@ -230,7 +232,7 @@ function export_prefix {
 	#  for now I won't be implementing since it would be
 	#  overthinking the original idea.
 	cd "$mitzune_prefix" \
-		&& tar -cvf - ./$prefixName \	# .mexp is just a xz'd tar file
+		&& tar -cvf - ./$prefixName \
 		| xz -${XZ_OPT:-4e} > ${exported_prefix_filename}.mexp
 	cd -
 	return 0
