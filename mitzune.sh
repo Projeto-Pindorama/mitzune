@@ -210,7 +210,30 @@ creation date: %s
 }
 
 function export_prefix { 
-	return 0 # TODO
+	exported_prefix_filename=${1:-$prefixName}
+	
+	#  This will do the following: enter the directory of
+	#  MITZUNE_PREFIX (previously treated with realpath() as
+	#  mitzune_prefix) and tar(1) the $prefixName, this will create a
+	#  .tar file with this structure (Note: this is an example output
+	#  from Schily's tar(1)):
+	#  a example/ directory
+	#  a example/example.rc 26 bytes, 1 tape blocks
+	#  a example/chroot.mit 1219 bytes, 3 tape blocks
+	#  This can be later imported and extracted into a new (or the
+	#  same, it doesn't matter) $MITZUNE_PREFIX. Yeah, directly into
+	#  it, not extracted directly on the $HOME.
+
+	#  It is indeed expected that the prefix will be inside the
+	#  $MITZUNE_PREFIX informed at mitzrc(5), not anywhere else.
+	#  There's possible a way to remove this restriction, but
+	#  for now I won't be implementing since it would be
+	#  overthinking the original idea.
+	cd "$mitzune_prefix" \
+		&& tar -cvf - ./$prefixName \	# .mexp is just a xz'd tar file
+		| xz -${XZ_OPT:-4e} > ${exported_prefix_filename}.mexp
+	cd -
+	return 0
 }
 
 function import_prefix { 
