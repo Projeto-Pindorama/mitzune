@@ -11,7 +11,7 @@
 mitzune_prefix="$(realpath "$MITZUNE_PREFIX")"
 
 function main {
-    while getopts ":n:R:C:cdriEI" options; do
+    while getopts ":n:R:C:cdriE:I:" options; do
 	    case "$options" in
 		    n) export prefixName="$OPTARG" ;;
 		    R) export rootfsTarball="$OPTARG" ;;
@@ -210,8 +210,17 @@ creation date: %s
 }
 
 function export_prefix { 
-	exported_prefix_filename=${1:-$prefixName}
+	if [ -n $1 ]; then
+		exported_prefix_dirname="$(dirname "$1")"	
+		exported_prefix_filename=$(basename $1)	
+	else
+		exported_prefix_dirname="$PWD"
+		exported_prefix_filename=$prefixName
+	fi
+	export exported_prefix_dirname exported_prefix_filename
 	
+	filename="${exported_prefix_filename}.mexp"
+
 	#  This will do the following: enter the directory of
 	#  MITZUNE_PREFIX (previously treated with realpath() as
 	#  mitzune_prefix) and tar(1) the $prefixName, this will create a
@@ -220,9 +229,10 @@ function export_prefix {
 	#  a example/ directory
 	#  a example/example.rc 26 bytes, 1 tape blocks
 	#  a example/chroot.mit 1219 bytes, 3 tape blocks
+	#
 	#  This can be later imported and extracted into a new (or the
-	#  same, it doesn't matter) $MITZUNE_PREFIX. Yeah, directly into
-	#  it, not extracted directly on the $HOME.
+	#  same, it doesn't matter) $MITZUNE_PREFIX.
+	#
 	#  The final file extension (mexp -> (M)itzune (ex)ported (p)refix)
 	#  is just a tarball compressed with xz.
 
@@ -231,14 +241,22 @@ function export_prefix {
 	#  There's possible a way to remove this restriction, but
 	#  for now I won't be implementing since it would be
 	#  overthinking the original idea.
+	
+	printerr "Warning: Exporting $prefixName to $exported_prefix_dirname/$filename."	
 	cd "$mitzune_prefix" \
-		&& tar -cvf - ./$prefixName \
-		| xz -${XZ_OPT:-4e} > ${exported_prefix_filename}.mexp
-	cd -
+		&& tar -cvf - $prefixName | xz -4e \
+		> "${exported_prefix_dirname}/${filename}"
+	cd "$OLDPWD" 
+
 	return 0
 }
 
-function import_prefix { 
+function import_prefix {
+	# Initial implementation, plans to change later on
+	exported_prefix="$(realpath "$1")"
+	
+	xz -cd "$exported_prefix" | tar -xvf - -C "$mitzune_prefix"
+
 	return 0 # TODO
 }
 
