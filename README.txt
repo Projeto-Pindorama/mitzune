@@ -64,8 +64,8 @@ it works! :^)
   faster.
 
 ## Get Mitzune
-Releases and VCS snapshots can be found at get.pindorama.dob.jp.
-http://get.pindorama.dob.jp/mitzune
+Releases can be found at get.pindorama.dob.jp.
+http://pindorama.dob.jp/pub/mitzune
 
 # How do I use it?
 There's a print_help function containing information about the basic usage.
