@@ -1,6 +1,8 @@
 # POSIX shell alternatives for external processes, in a single libary.
 # forked from now defunct Shell Script-written otto-pkg
 
+# vim: filetype=sh :
+
 # basename
 basename(){
 	DIR=${1%${1##*[!/]}}
@@ -12,9 +14,9 @@ basename(){
 # realpath
 realpath(){
   # ./sources.txt -> sources.txt
-  file_basename=`basename $1`
+  file_basename="`basename "$1"`"
   # ./sources.txt -> .
-  file_dirname=`dirname $1`
+  file_dirname="`dirname "$1"`"
 	# get the absolute directory name
 	# example: ./sources.txt -> /usr/src/copacabana-repo/sources.txt
 	# cd ./; pwd -> /usr/src/copacabana-repo
