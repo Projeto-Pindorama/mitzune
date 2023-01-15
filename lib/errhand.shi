@@ -1,6 +1,8 @@
 # error handling library
 # pretty straightfoward
 
+# vim: set filetype=sh :
+
 # Program information, why not?
 PROGNAME=`basename $0`
 
