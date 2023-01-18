@@ -39,12 +39,17 @@ timeout(){
 
 # nproc
 nproc(){
-	grep 'processor' /proc/cpuinfo | wc -l 
+  case "`uname -s`" in
+    Darwin | Linux) getconf '_NPROCESSORS_ONLN';;
+    FreeBSD | OpenBSD | NetBSD) getconf 'NPROCESSORS_ONLN';;
+    SunOS) echo "`ksh93 -c 'getconf NPROCESSORS_ONLN'`" ;;
+  esac
 }
 
 # The # macro for arrays.
 n(){
-	# based on what Caio did on Copacabana cmd/download_sources.sh
+	# based on what Caio did on
+	# Copacabana's cmd/download_sources.sh
 	echo ${@} | wc -w
 }
 
