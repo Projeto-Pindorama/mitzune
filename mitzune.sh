@@ -32,15 +32,15 @@ function main {
 function check_doas {
     # doas will be necessary for now since i don't really know how to
     # work with namespaces in Linux for chroot'ing without root rights
-    if $(grep "$USER" "$DOAS_CONF" &>/dev/null); then
+    if $(grep "$(whoami)" "$DOAS_CONF" &>/dev/null); then
  	function elevate { doas -- "$@"; }
 	export -f elevate
    	return 
     elif [ $UID == 0 ]; then
         printerr 'Warning: running as root. This isn'\''t recommended.'
-    elif $(id -nG $USER | grep 'wheel'); then
+    elif $(groups $(whoami) | grep 'wheel'); then
 	printerr 'Warning: %s can log directly as root, although using doas is better.' \
-		"$USER"
+		"$(whoami)"
 	function elevate { su -c "$@"; }
 	export -f elevate
     else
