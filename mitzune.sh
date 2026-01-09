@@ -16,6 +16,7 @@ function main {
 		    n) export prefixName="$OPTARG" ;;
 		    R) export rootfsTarball="$OPTARG" ;;
 		    C) export chrootOptions="$OPTARG" ;;
+		    S) export customSHELL="$OPTARG" ;;
 		    c) create_prefix ;;
 		    d) delete_prefix ;;
 		    r) run_prefix ;;
@@ -145,6 +146,7 @@ function write_prefix_config {
 function write_chroot_mitzune {
 	newPrefix="$1"
 	prefixMit="$newPrefix/chroot.mit"
+	shellToUse="${customSHELL:-'/bin/sh'}"
 	cat > $prefixMit <<EOF
 # This file is part of Mitzune.
 
@@ -156,7 +158,7 @@ function write_chroot_mitzune {
 # in the script.
 
 function enter_chroot {
-	chroot $newPrefix/rootfs /bin/sh
+	chroot $newPrefix/rootfs "$shellToUse"
 }
 EOF
 	export prefixMit
