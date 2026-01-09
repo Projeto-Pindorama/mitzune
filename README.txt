@@ -1,19 +1,21 @@
 # Mitzune - chroot environments, for poor lads who don't have VMX support on
 # their processors
-This is just a prototype that I'm using to test Copacabana Linux on my PC via
-chroot(8) since I don't have support to VMX in my low-end 10-year-old processor.
-Yeah, fuck you Intel, People's Republic of China, TSMC and modern car manufacturers.
-And fuck you too, Brazil gov't. I don't deserve being smashed by taxes and 
-inflation and don't getting any nearly decent state services back.
 
-So while I can't afford a new laptop, I will use this.
-If this succeeds, I will remake it in Go, with faggotries like JSON for configu
-ration et cetera. And because Shell is fucking ugly.
+This is used for general chroot environments, in a similar spirit to Docker, but
+perhaps, if we could say, more naïve.
+It is being used in Copacabana Linux's build process, but it originally was
+designed to unpack a rootfs tarball in which operations besides chroot could be
+done, like mounting VFSes and such.
+It's still experimental, so use it with caution as always.
+If you've taken a old version of this before, you may realize this README was
+saltier and, well, considering that the World's condition has somewhat improved
+since 2021, I've decided to unsalt it a little.
+Also, I'm not 16 years old anymore.
 
 # What is the main idea?
 The main idea is that you have a prefix (~/mitzune) where you can extract/copy
-another UNIX-like (same-kernel, in case of a Linux host, of course) operating 
-system of same architecture root files (which can be saved on an tarball) and 
+another UNIX-like (same-kernel, in case of a Linux host, of course) operating
+system of same architecture root files (which can be saved on an tarball) and
 then configure it.
 After that, in theory, you'd just need to run Mitzune + the prefix name + the
 operation.
@@ -28,10 +30,10 @@ anything else; if you feel the need to use anything else, like for example bzip2
 just pull-resquest it!
 
 You can also create a Shell-style configuration file using the -C option, just
-set it before -c(reate) or -r(un). 
-Its contents will be sent into chroot's /etc/profile (if OVERWRITE_CHROOT_PROFILE 
-is equal to "true") or into an identificable Mitzune file called mitzune_config.sh 
-located at /etc/profile.d (if OVERWRITE_CHROOT_PROFILE is equal to "false" or 
+set it before -c(reate) or -r(un).
+Its contents will be sent into chroot's /etc/profile (if OVERWRITE_CHROOT_PROFILE
+is equal to "true") or into an identificable Mitzune file called mitzune_config.sh
+located at /etc/profile.d (if OVERWRITE_CHROOT_PROFILE is equal to "false" or
 anything else).
 
 In Alpine Linux, you may need to source /etc/profile right after logging into it.
@@ -48,7 +50,7 @@ xz and un-tar it directly to your home directory:
 xz -cd mitzune.?.?-?.NOARCH.Linux.tar.xz | tar -xvf - -C ~/
 
 But, before you ask me, this is a work in progress.
-At this moment, 17th October 2021, you can't map a prefix (using find(1) + 
+At this moment, 17th October 2021, you can't map a prefix (using find(1) +
 xz(1) (for compressing it)) yet.
 There's already an implementation for chrooting with Mitzune, but it's
 experimental (polite word for "crappy") yet and needs some polishing, but hey,
