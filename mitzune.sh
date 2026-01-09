@@ -35,10 +35,10 @@ function check_doas {
     if $(grep "$(whoami)" "$DOAS_CONF" &>/dev/null); then
  	function elevate { doas -- "$@"; }
 	export -f elevate
-   	return 
+	return
     elif [ $UID == 0 ]; then
         printerr 'Warning: running as root. This isn'\''t recommended.'
-    elif $(groups $(whoami) | grep 'wheel'); then
+    elif $(groups "$(whoami)" | grep 'wheel'); then
 	printerr 'Warning: %s can log directly as root, although using doas is better.' \
 		"$(whoami)"
 	function elevate { su -c "$@"; }
@@ -46,7 +46,6 @@ function check_doas {
     else
         oh_mist 'Fatal: It appears your user doesn'\''t have doas privileges.' 1
     fi
-    
 }
 
 function create_prefix {
@@ -72,7 +71,7 @@ function create_prefix {
     # being NULL or not, since this file is essential to initialize the chroot
     # prefix.
     write_chroot_mitzune "$newPrefix"
-    
+
     # Unfortunately we can't trust lines() when the file is empty
     installedPrefixes="$(sed '/#/d' "$mitzune_prefix/prefixes" | wc -l | awk '{print $1}')"
 
@@ -103,7 +102,7 @@ function copy2prefix {
     rootfsTarball="$1"
     newPrefix="$2"
     # Get rootfs extension using built-in regex
-    		     # |cut absolute path| 
+    		     # |cut absolute path|
     rootfsTarballExt="${rootfsTarball##*/}"
     		     # |cut anything before the extension|
     rootfsTarballExt="${rootfsTarballExt##*.}"
@@ -117,9 +116,9 @@ function copy2prefix {
 
     mkdir -v $newPrefix/rootfs && \
     if [ $isTarball == 't' ]; then
-	    c -cd "$rootfsTarball" | tar -xvf - -C "$newPrefix"/rootfs
+	    c -cd "$rootfsTarball" | tar -xvf - -C "$newPrefix/rootfs"
     elif [ $isTarball == 'f' ]; then
-	    cp -rv "$rootfsTarball/*" "$newPrefix"/rootfs
+	    (cd "$rootfsTarball"; tar -cf - .) | tar -xvf - -C "$newPrefix/rootfs"
     fi
 }
 
@@ -130,7 +129,7 @@ function write_prefix_config {
 	prefixProfile="$newPrefix/$prefixName.rc"
 
 	printf '%s' "$chrootOptions" > "$prefixProfile" && \
-	if [ $OVERWRITE_CHROOT_PROFILE == true ]; then
+	if [ "$OVERWRITE_CHROOT_PROFILE" == true ]; then
 		chrootProfile="$newPrefix/rootfs/etc/profile"
 	else
 		chrootProfile="$newPrefix/rootfs/etc/profile.d/mitzune_conf.sh"
@@ -139,18 +138,18 @@ function write_prefix_config {
 	test -e "$(dirname $chrootProfile)" \
 		|| mkdir -p "$(dirname $chrootProfile)"
 	cp -vf "$prefixProfile" "$chrootProfile"
-	
+
 	export prefixProfile chrootProfile
 }
 
-function write_chroot_mitzune { 
+function write_chroot_mitzune {
 	newPrefix="$1"
 	prefixMit="$newPrefix/chroot.mit"
 	cat > $prefixMit <<EOF
 # This file is part of Mitzune.
 
 # Copyright (c) 2021 Luiz Antônio Rangel. All rights reserved.
-# This work is licensed under the terms of the MIT license.  
+# This work is licensed under the terms of the MIT license.
 # For a copy, see <https://opensource.org/licenses/MIT>.
 
 # DO NOT call this function in this file, it will be called
@@ -161,11 +160,10 @@ function enter_chroot {
 }
 EOF
 	export prefixMit
-	
 }
 
 function run_prefix {
-    prefixtobeRun="$mitzune_prefix/$prefixName" 
+    prefixtobeRun="$mitzune_prefix/$prefixName"
 
     check_doas
 
@@ -188,7 +186,7 @@ function show_prefix_info {
 	# pulling it from the disc every time.
 	prefix_info=($(grep "$prefixName" "$mitzune_prefix/prefixes"))
 	prefix_partition=$(df -H "${prefix_info[2]}" | awk 'FNR==2 {print $1}')
-	
+
 	# Mitzune's prefixes file is a matrix which has 9 columns
 	if [ $(n $(echo ${prefix_info[*]} | tr -d 'NULL')) \< '9' ]; then
 		printerr 'Warning: some information about the prefix isn'\''t avaliable'
@@ -204,21 +202,21 @@ prefix shell profile: %s
 chroot profile overwrite?: %s
 creation date: %s
 ' "${prefix_info[1]}" $(trim_home_path "${prefix_info[2]}") "${prefix_info[0]}" \
-	"$prefix_partition" $(trim_home_path "${prefix_info[4]}") \
-	$(trim_home_path "${prefix_info[7]}") "${prefix_info[6]}" \
+	"$prefix_partition" "$(trim_home_path "${prefix_info[4]}")" \
+	"$(trim_home_path "${prefix_info[7]}")" "${prefix_info[6]}" \
 	"${prefix_info[8]}"
 }
 
-function export_prefix { 
+function export_prefix {
 	if [ -n $1 ]; then
-		exported_prefix_dirname="$(dirname "$1")"	
-		exported_prefix_filename=$(basename $1)	
+		exported_prefix_dirname="$(dirname "$1")"
+		exported_prefix_filename="$(basename "$1")"
 	else
 		exported_prefix_dirname="$PWD"
 		exported_prefix_filename=$prefixName
 	fi
 	export exported_prefix_dirname exported_prefix_filename
-	
+
 	filename="${exported_prefix_filename}.mexp"
 
 	#  This will do the following: enter the directory of
@@ -241,12 +239,12 @@ function export_prefix {
 	#  There's possible a way to remove this restriction, but
 	#  for now I won't be implementing since it would be
 	#  overthinking the original idea.
-	
-	printerr "Warning: Exporting $prefixName to $exported_prefix_dirname/$filename."	
+
+	printerr "Warning: Exporting $prefixName to $exported_prefix_dirname/$filename."
 	cd "$mitzune_prefix" \
-		&& tar -cvf - $prefixName | xz -4e \
+		&& tar -cvf - "$prefixName" | xz -4e \
 		> "${exported_prefix_dirname}/${filename}"
-	cd "$OLDPWD" 
+	cd "$OLDPWD"
 
 	return 0
 }
@@ -254,7 +252,7 @@ function export_prefix {
 function import_prefix {
 	# Initial implementation, plans to change later on
 	exported_prefix="$(realpath "$1")"
-	
+
 	xz -cd "$exported_prefix" | tar -xvf - -C "$mitzune_prefix"
 
 	return 0 # TODO
@@ -276,7 +274,7 @@ options:
  -I: import prefix (TODO)
 ' $PROGNAME $1 $PROGNAME
 
-	exit 0
+	exit 1
 }
 
 main "$@"
