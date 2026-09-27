@@ -1,11 +1,11 @@
-#!/usr/bin/env bash
+#!/usr/bin/env ksh93
 
 # Source user configuration
-. $HOME/.config/mitzrc
+. "$HOME/.config/mitzrc"
 
 # include libraries
-. $MITZUNE_LIBDIR/errhand.shi
-. $MITZUNE_LIBDIR/posix-alt.shi
+. "$MITZUNE_LIBDIR/errhand.shi"
+. "$MITZUNE_LIBDIR/posix-alt.shi"
 
 # Cuz I'm real
 mitzune_prefix="$(realpath "$MITZUNE_PREFIX")"
@@ -26,6 +26,9 @@ function main {
 		    *|\?|h) print_help $OPTARG ;;
 	    esac
     done
+    if (( (OPTIND - 1) == 0 )); then
+	    print_help
+    fi
     shift $(( OPTIND - 1 ))
     clean_n_quit 0
 }
@@ -35,7 +38,7 @@ function check_doas {
     # work with namespaces in Linux for chroot'ing without root rights
     if $(grep "$(whoami)" "$DOAS_CONF" &>/dev/null); then
  	function elevate { doas -- "$@"; }
-	export -f elevate
+	typeset -rx FElevate="$(typeset -f elevate)"
 	return
     elif [ $UID == 0 ]; then
         printerr 'Warning: running as root. This isn'\''t recommended.'
@@ -43,7 +46,7 @@ function check_doas {
 	printerr 'Warning: %s can log directly as root, although using doas is better.' \
 		"$(whoami)"
 	function elevate { su -c "$@"; }
-	export -f elevate
+	typeset -rx FElevate="$(typeset -f elevate)"
     else
         oh_mist 'Fatal: It appears your user doesn'\''t have doas privileges.' 1
     fi
@@ -55,7 +58,7 @@ function create_prefix {
     mkdir "$newPrefix" && \
     if [ -z "$rootfsTarball" ]; then
 	    printerr 'Warning: no rootfs declared, creating empty rootfs directory.'
-	    mkdir -v "$newPrefix/rootfs"
+	    mkdir "$newPrefix/rootfs"
     else
 	    realpathRootfsTarball="$(realpath "$rootfsTarball")"
 	    copy2prefix "$realpathRootfsTarball" "$newPrefix"
@@ -73,24 +76,34 @@ function create_prefix {
     # prefix.
     write_chroot_mitzune "$newPrefix"
 
-    # Unfortunately we can't trust lines() when the file is empty
-    installedPrefixes="$(sed '/#/d' "$mitzune_prefix/prefixes" | wc -l | awk '{print $1}')"
-
-    printf '%s %s %s %s %s %s %s %s %s\n' "$(( installedPrefixes + 1 ))" \
-    "$prefixName" "$newPrefix" "${prefixProfile:-NULL}" "${prefixMit:-NULL}" \
-    "${rootfsTarball:-NULL}" "$OVERWRITE_CHROOT_PROFILE" \
-    "${chrootProfile:-NULL}" "$(date +%Y-%m-%d)" >> "$mitzune_prefix/prefixes"
+    create_entry "$prefixName" "$newPrefix" "${prefixProfile:-NULL}" \
+	    "${prefixMit:-NULL}" "${rootfsTarball:-NULL}" \
+	    "$OVERWRITE_CHROOT_PROFILE" "${chrootProfile:-NULL}"
 
     printf 'Success: %s prefix created.' "$prefixName"
 }
 
+function create_entry {
+    # As the name says, this function serves the purpose of writing a new entry
+    # on the "prefixes" file. Since I'm quite lazy, I won't be re-naming every
+    # variable here, but just referencing its position as arguments.
+
+    # Unfortunately we can't trust lines() when the file is empty
+    installedPrefixes="$(sed '/#/d' "$mitzune_prefix/prefixes" | wc -l | awk '{print $1}')"
+
+    printf >> "$mitzune_prefix/prefixes" \
+	    '%s|%s|%s|%s|%s|%s|%s|%s|%s\n' "$(( installedPrefixes + 1 ))" \
+	    "$1" "$2" "$3" "$4" "$5" "$6" "$7" "$(date +%Y-%m-%d)"
+}
+
 function delete_prefix {
     # Remove the prefix itself
-    rm -rvI $mitzune_prefix/$prefixName || \
+    rm -rv $mitzune_prefix/$prefixName || \
 	    oh_mist "Fatal: Couldn't remove $prefixName directory ($mitzune_prefix/$prefixName)." 6
 
     # Create a safe temporary file
-    TMPFILE="$(mktemp -t mitzune.XXXXXX)" || oh_mist 'Fatal: Couldn'\''t create temporary file.' 10
+    TMPFILE="$(mktemp -t mitzune.XXXXXX)" || \
+	    oh_mist 'Fatal: Couldn'\''t create temporary file.' 10
 
     # Remove the prefix mention at our "database"
     sed "/$prefixName/d" "$mitzune_prefix/prefixes" > "$TMPFILE" && \
@@ -115,7 +128,7 @@ function copy2prefix {
 	    *) export isTarball=f;; # Will just try to copy files as it
     esac    		   	    # is a directory. It's in God's hands.
 
-    mkdir -v $newPrefix/rootfs && \
+    mkdir -p "$newPrefix/rootfs" && \
     if [ $isTarball == 't' ]; then
 	    c -cd "$rootfsTarball" | tar -xvf - -C "$newPrefix/rootfs"
     elif [ $isTarball == 'f' ]; then
@@ -166,8 +179,8 @@ EOF
 
 function run_prefix {
     prefixtobeRun="$mitzune_prefix/$prefixName"
-
     check_doas
+    $FElevate
 
     if [ -n "$chrootOptions" ]; then
 	    printerr 'Warning: rewriting your chroot profile.'
@@ -183,14 +196,11 @@ function run_prefix {
 function show_prefix_info {
 	# Transforms the line containing the $prefixName information
 	# in an array.
-	# This is fairly faster than just using awk, since we're
-	# just throwing the information at the memory instead of
-	# pulling it from the disc every time.
-	prefix_info=($(grep "$prefixName" "$mitzune_prefix/prefixes"))
-	prefix_partition=$(df -H "${prefix_info[2]}" | awk 'FNR==2 {print $1}')
-
+	grep "|$prefixName|" "$mitzune_prefix/prefixes" |
+		IFS='|' read -r -a prefix_info
+	prefix_partition=$(df -h "${prefix_info[2]}" | awk 'FNR==2 {print $1}')
 	# Mitzune's prefixes file is a matrix which has 9 columns
-	if [ $(n $(echo ${prefix_info[*]} | tr -d 'NULL')) \< '9' ]; then
+	if (( $(n $(echo ${prefix_info[*]} | tr -d 'NULL')) < 9 )); then
 		printerr 'Warning: some information about the prefix isn'\''t avaliable'
 	fi
 
@@ -215,7 +225,7 @@ function export_prefix {
 		exported_prefix_filename="$(basename "$1")"
 	else
 		exported_prefix_dirname="$PWD"
-		exported_prefix_filename=$prefixName
+		exported_prefix_filename="$prefixName"
 	fi
 	export exported_prefix_dirname exported_prefix_filename
 
@@ -252,17 +262,42 @@ function export_prefix {
 }
 
 function import_prefix {
-	# Initial implementation, plans to change later on
+	# (Not so) initial implementation, still got
+	# plans to change later on.
 	exported_prefix="$(realpath "$1")"
+	rootfsTarball="$(basename "$exported_prefix")"
 
-	xz -cd "$exported_prefix" | tar -xvf - -C "$mitzune_prefix"
+	# We could use the .mexp filename as the prefixName, however, names can
+	# get corrupted on the way, so we will attempt to obtain it.
+	# I believe these would just work at non-SVR4 tar implementations, which
+	# excludes star... So we will have the .mexp as a fallback.
+	if ("$tar_cmd" --help 2>&1 | egrep 'bsdtar|GNU|Toybox|BusyBox' 2>/dev/null); then
+		# Got this from good ol' Server Fault: https://serverfault.com/a/989827
+		{ prefixName="$(dirname "$(xz -cd "$exported_prefix" \
+			| tar -oxvf - -C "$mitzune_prefix" \
+			| tee /dev/fd/3 | sed 1q)")"; } 3>&2
+	else
+		prefixName="$(basename "$exported_prefix" .mexp)"
+		xz -cd "$exported_prefix" | (cd "$mitzune_prefix" && tar -oxvf -)
+	fi
+	newPrefix="$mitzune_prefix/$prefixName"
+	prefixProfile="$newPrefix/$prefixName.rc"
+	prefixMit="$newPrefix/chroot.mit"
 
-	return 0 # TODO
+	# Write to our little matrix "database" at the "prefixes" file.
+	create_entry "$prefixName" "$newPrefix" "${prefixProfile:-NULL}" \
+	    "$prefixMit" "${rootfsTarball:-NULL}" '?' '?'
+
+	return 0 # TODO (perhaps)
 }
 
 function print_help {
-	printf '%s: illegal option "%s"
-[usage]: %s -n example [options]
+	case "$1" in
+		''|'h'|'?') ;;
+		*) printf '%s: illegal option "%s"\n' \
+			$PROGNAME $1 ;;
+	esac
+	printf '[usage]: %s -n example [options]
 
 options:
  -n: Prefix name
@@ -274,7 +309,7 @@ options:
  -i: show prefix information
  -E: export prefix
  -I: import prefix (TODO)
-' $PROGNAME $1 $PROGNAME
+'  $PROGNAME
 
 	exit 1
 }
