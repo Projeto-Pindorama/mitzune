@@ -97,8 +97,10 @@ function create_entry {
 }
 
 function delete_prefix {
+    [ -z "$mitzune_prefix$prefixName" ] \
+	    && oh_mist 'Fatal: $mitzune_prefix or $prefixName unset. Not today!' 1
     # Remove the prefix itself
-    rm -rv $mitzune_prefix/$prefixName || \
+    rm -rv "$mitzune_prefix/$prefixName" || \
 	    oh_mist "Fatal: Couldn't remove $prefixName directory ($mitzune_prefix/$prefixName)." 6
 
     # Create a safe temporary file
@@ -265,7 +267,7 @@ function import_prefix {
 	# (Not so) initial implementation, still got
 	# plans to change later on.
 	exported_prefix="$(realpath "$1")"
-	rootfsTarball="$(basename "$exported_prefix")"
+	rootfsTarball="$exported_prefix"
 
 	# We could use the .mexp filename as the prefixName, however, names can
 	# get corrupted on the way, so we will attempt to obtain it.
@@ -281,8 +283,13 @@ function import_prefix {
 		xz -cd "$exported_prefix" | (cd "$mitzune_prefix" && tar -oxvf -)
 	fi
 	newPrefix="$mitzune_prefix/$prefixName"
-	prefixProfile="$newPrefix/$prefixName.rc"
 	prefixMit="$newPrefix/chroot.mit"
+	# The .rc profile isn't obligatory when creating a prefix.
+	# Therefore, we can not suppose that there's an actual .rc
+	# file before checking its contents.
+	if [ -s "$newPrefix/$prefixName.rc" ]; then
+		prefixProfile="$newPrefix/$prefixName.rc"
+	fi
 
 	# Write to our little matrix "database" at the "prefixes" file.
 	create_entry "$prefixName" "$newPrefix" "${prefixProfile:-NULL}" \
