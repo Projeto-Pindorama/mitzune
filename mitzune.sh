@@ -97,8 +97,9 @@ function create_entry {
 }
 
 function delete_prefix {
-    [ -z "$mitzune_prefix$prefixName" ] \
-	    && oh_mist 'Fatal: $mitzune_prefix or $prefixName unset. Not today!' 1
+    if [ -z "$mitzune_prefix" ] || [ -z "$prefixName" ]; then
+	    oh_mist 'Fatal: $mitzune_prefix or $prefixName unset. Not today!' 1
+    fi
     # Remove the prefix itself
     rm -rv "$mitzune_prefix/$prefixName" || \
 	    oh_mist "Fatal: Couldn't remove $prefixName directory ($mitzune_prefix/$prefixName)." 6
