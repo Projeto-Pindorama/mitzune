@@ -191,7 +191,7 @@ function run_prefix {
     fi
 
     source "$prefixtobeRun"/chroot.mit
-    readonly decChrootFunction=$(declare -f enter_chroot)
+    readonly decChrootFunction="$(typeset -f enter_chroot)"
 
     elevate sh -c "$decChrootFunction; enter_chroot"
 }
